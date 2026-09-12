@@ -2,15 +2,23 @@ use sha2::{Digest, Sha256};
 
 #[derive(Debug)]
 pub struct Block {
-    pub index: u64,
-    pub timestamp: u64,
-    pub transactions: String,
-    pub previous_hash: String,
-    pub nonce: u64,
-    pub hash: String,
+    index: u64,
+    timestamp: u64,
+    transactions: String,
+    previous_hash: String,
+    nonce: u64,
+    hash: String,
 }
 
 impl Block {
+    pub fn hash(&self) -> &str {
+        &self.hash
+    }
+
+    pub fn previous_hash(&self) -> &str {
+        &self.previous_hash
+    }
+
     pub fn genesis(difficulty: usize) -> Self {
         let (nonce, hash) = Self::mine(0, 0, "Genesis Block", "0", difficulty,);
         Self::new(0, 0, "Genesis Block", "0", nonce, &hash)
@@ -41,7 +49,7 @@ impl Block {
         }
     }
 
-    pub fn calculate_hash(index: u64, timestamp: u64, transactions: &str, previous_hash: &str, nonce: u64)-> String {
+    fn calculate_hash(index: u64, timestamp: u64, transactions: &str, previous_hash: &str, nonce: u64)-> String {
         let mut hasher = Sha256::new();
 
         let input = format!(

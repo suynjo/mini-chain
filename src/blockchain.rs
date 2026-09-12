@@ -1,11 +1,18 @@
 use crate::block::Block;
+use std::time::{SystemTime, UNIX_EPOCH};
+use crate::transaction::Transaction;
+
 
 pub struct Blockchain {
-    pub chain: Vec<Block>,
-    pub difficulty: usize,
+    chain: Vec<Block>,
+    difficulty: usize,
 }
 
 impl Blockchain {
+    fn next_index(&self) -> u64 {
+        self.chain.len() as u64
+    }
+
     pub fn new(genesis_block: Block, difficulty: usize) -> Self {
         Self {
             chain: vec![genesis_block],
@@ -17,7 +24,7 @@ impl Blockchain {
         self.chain.push(block);
     }
 
-    pub fn is_valid(&self) -> bool {
+    fn is_valid(&self) -> bool {
         if self.chain.is_empty() {
             return false;
         }
@@ -31,14 +38,14 @@ impl Blockchain {
                 return false;
             }
 
-            if !current.hash.starts_with(&target) {
+            if !current.hash().starts_with(&target) {
                 return false;
             }
 
             if i > 0 {
                 let previous = &self.chain[i - 1];
 
-                if current.previous_hash != previous.hash {
+                if current.previous_hash() != previous.hash() {
                     return false;
                 }
             }
@@ -49,5 +56,22 @@ impl Blockchain {
 
     pub fn print(&self) {
         println!("Blockchain valid: {}", self.is_valid());
+    }
+
+    pub fn make_block (&self, transaction: Transaction)-> Block {
+        let index = self.next_index();
+        let timestamp = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
+        let transactions = transaction.to_string();
+        let previous_hash = self.chain.last().unwrap().hash();
+        let (nonce, hash) = Block::mine(index, timestamp, &transactions, &previous_hash, self.difficulty);
+
+        Block::new(
+            index,
+            timestamp,
+            &transactions,
+            previous_hash,
+            nonce,
+            &hash,
+        )
     }
 }

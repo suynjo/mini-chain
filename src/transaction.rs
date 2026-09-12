@@ -1,10 +1,11 @@
 use sha2::{Digest, Sha256};
+use std::fmt;
 
 pub struct Transaction {
-    pub from: String,
-    pub to: String,
-    pub amount: u64,
-    pub id: String,
+    from: String,
+    to: String,
+    amount: u64,
+    id: String,
 }
 
 impl Transaction {
@@ -37,6 +38,19 @@ impl Transaction {
 
     pub fn is_valid(&self) -> bool {
         !self.from.is_empty() && !self.to.is_empty() && self.from != self.to && self.amount > 0
+        && self.id == Self::calculate_hash(&self.from, &self.to, self.amount)
     }
 }
 
+impl fmt::Display for Transaction {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "User(from: {}, to: {}, amount: {}, id: {})",
+            self.from,
+            self.to,
+            self.amount,
+            self.id
+        )
+    }
+}

@@ -1,7 +1,4 @@
 use std::io;
-use std::time::{SystemTime, UNIX_EPOCH};
-use std::fmt;
-
 
 mod block;
 use crate::block::Block;
@@ -47,8 +44,7 @@ fn main() {
             continue;
         }
         
-        let block = make_block(transaction, &blockchain);
-
+        let block = blockchain.make_block(transaction);
 
         println!("======================================");
         block.print();
@@ -58,25 +54,3 @@ fn main() {
     }
 }
 
-impl fmt::Display for Transaction {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "User(from: {}, to: {}, amount: {}, id: {})", self.from, self.to, self.amount, self.id)
-    }
-}
-
-fn make_block (transaction: Transaction, blockchain: &Blockchain)-> Block {
-    let index = blockchain.chain.len() as u64;
-    let timestamp = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
-    let transactions = transaction.to_string();
-    let previous_hash = blockchain.chain.last().unwrap().hash.clone();
-    let (nonce, hash) = Block::mine(index, timestamp, &transactions, &previous_hash, blockchain.difficulty);
-
-    Block::new(
-        index,
-        timestamp,
-        &transactions,
-        &previous_hash,
-        nonce,
-        &hash,
-    )
-}
