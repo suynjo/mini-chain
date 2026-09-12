@@ -1,7 +1,7 @@
 ## TODO
 - [x] Basic structs
 - [x] Proof of Work
-- [ ] Transaction
+- [x] Transaction
 - [ ] State
 - [ ] Wallet
 - [ ] CLI commands
