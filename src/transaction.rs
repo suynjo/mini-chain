@@ -46,7 +46,7 @@ impl fmt::Display for Transaction {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "User(from: {}, to: {}, amount: {}, id: {})",
+            "Transaction(from: {}, to: {}, amount: {}, id: {})",
             self.from,
             self.to,
             self.amount,

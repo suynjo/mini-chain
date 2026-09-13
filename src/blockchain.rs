@@ -2,7 +2,7 @@ use crate::block::Block;
 use std::time::{SystemTime, UNIX_EPOCH};
 use crate::transaction::Transaction;
 
-
+#[derive(Debug)]
 pub struct Blockchain {
     chain: Vec<Block>,
     difficulty: usize,
@@ -53,8 +53,11 @@ impl Blockchain {
 
         true
     }
-
+    
     pub fn print(&self) {
+        for x in &self.chain {
+            println!("{:#?}", x);
+        }
         println!("Blockchain valid: {}", self.is_valid());
     }
 
