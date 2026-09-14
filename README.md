@@ -4,4 +4,5 @@
 - [x] Transaction
 - [ ] State
 - [ ] Wallet
-- [ ] CLI commands
+- [x] CLI commands
+- [ ] Tests
