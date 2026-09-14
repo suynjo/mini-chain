@@ -34,13 +34,15 @@ impl Block {
             hash: hash.to_string(),
         }
     }
+
+
     
     pub fn mine(index: u64, timestamp: u64, transactions: &str, previous_hash: &str, difficulty: usize)-> (u64, String){
         let mut nonce = 0;
         let target = "0".repeat(difficulty);
 
         loop {
-            let hash = Self::calculate_hash(index, timestamp, transactions, previous_hash, nonce);
+            let hash = Self::calculate_hash(index, timestamp, &transactions, previous_hash, nonce);
 
             if hash.starts_with(&target) {
                 return (nonce, hash);
@@ -80,17 +82,13 @@ impl Block {
     }
 
     pub fn print(&self) {
-        let validation = if self.is_valid() {
-            "Valid"
-        } else {
-            "Invalid"
-        };
+        println!("Block #{}", self.index);
+        println!("--------------------------------------");
 
-        println!("Block #{} - {}", self.index, validation);
-        println!("Transactions    : {}", self.transactions);
-        println!("Timestamp       : {}", self.timestamp);
-        println!("Previous Hash   : {}", self.previous_hash);
-        println!("Hash            : {}", self.hash);
-        println!("Nonce           : {}", self.nonce);
+        println!("Timestamp     : {}", self.timestamp);
+        println!("Transactions  : {}", self.transactions);
+        println!("Previous Hash : {}", self.previous_hash);
+        println!("Hash          : {}", self.hash);
+        println!("Nonce         : {}", self.nonce);
     }
 }

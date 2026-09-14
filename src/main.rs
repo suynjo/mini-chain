@@ -34,6 +34,10 @@ enum Commands {
         amount: u64,
     },
 
+    Check,
+
+    Mine,
+
     Print,
 
     Exit,
@@ -43,11 +47,15 @@ fn main() {
     let difficulty: usize = 4;
     let genesis_block = Block::genesis(difficulty);
     let mut blockchain = Blockchain::new(genesis_block, difficulty);
+
+    let mut pending_transactions: Vec<Transaction> = Vec::new();
+
     println!("Welcome to MINI-CHAIN CLI!");
-    println!("Available commands: add --from <name> --to <name> --amount <num>, print, exit\n");
+    println!("- [Add transaction] add --from <name> --to <name> --amount <num>");
+    println!("- [Exit] exit");
 
     loop {
-            let mut input = String::new();
+        let mut input = String::new();
         io::stdin().read_line(&mut input).expect("Failed to read line");
         let input = input.trim();
 
@@ -66,17 +74,43 @@ fn main() {
             }
         };
         match cli_args.command {
-        // add block
-        Commands::Add { ref from, ref to, amount, } => {
-            let from = from;
-            let to = to;
-            let amount = amount;
 
-            let transaction = Transaction::new(&from, &to, amount);
+        Commands::Add { ref from, ref to, amount, } => {
+            let transaction = Transaction::new(from, to, amount);
             if !transaction.is_valid() {
                 println!("Invalid transaction!");
             }
             else {
+                pending_transactions.push(transaction);
+                println!("======================================");
+                println!("Transaction added to the pending pool.");
+                println!("- [Add transaction] add --from <name> --to <name> --amount <num>");
+                println!("- [Check transactions] check");
+            }
+        }
+
+        Commands::Check => {
+            if pending_transactions.is_empty() {
+                println!("======================================");
+                println!("No pending transactions.");
+            } else {
+                println!("======================================");
+                for tx in &pending_transactions {
+                    println!("{}", tx);
+                }
+            }
+            println!("======================================");
+            println!("- [Add transaction] add --from <name> --to <name> --amount <num>");
+            println!("- [Start mining] mine");
+        }
+
+        Commands::Mine => {
+            if pending_transactions.is_empty() {
+                println!("No pending transactions to mine.");
+                continue;
+            }
+
+            let transactions = pending_transactions.iter().map(|tx| tx.to_string()).collect::<Vec<String>>().join("|");
 
             let pb = ProgressBar::new_spinner();
             pb.set_style(
@@ -85,26 +119,28 @@ fn main() {
                     .template("{spinner:.green} {msg}")
                     .unwrap(),
             );
-            pb.set_message("mining...");
+            pb.set_message("Mining...");
 
             pb.enable_steady_tick(Duration::from_millis(100));
-            let block = blockchain.make_block(transaction);
+            let block = blockchain.make_block(transactions);
             println!("======================================");
             block.print();
             blockchain.add_block(block);
+            pending_transactions.clear();
             println!("======================================");
-
-            pb.finish_with_message(format!("block added!"));
-            println!("Available commands: add --from <name> --to <name> --amount <num>, print, exit\n");
+            pb.finish_with_message("Block added!");
+            println!("======================================");
+            println!("- [Add transaction] add --from <name> --to <name> --amount <num>");
+            println!("- [Print blockchain] print");
+            println!("- [Exit] exit");
         }
-        }
 
-        // print all blockchain
         Commands::Print => {
             println!("======================================");
             blockchain.print();
             println!("======================================");
-            println!("Available commands: add --from <name> --to <name> --amount <num>, print, exit\n");
+            println!("- [Add transaction] add --from <name> --to <name> --amount <num>");
+            println!("- [Exit] exit");
         }
 
         Commands::Exit => {

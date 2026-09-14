@@ -1,6 +1,5 @@
 use crate::block::Block;
 use std::time::{SystemTime, UNIX_EPOCH};
-use crate::transaction::Transaction;
 
 #[derive(Debug)]
 pub struct Blockchain {
@@ -55,16 +54,17 @@ impl Blockchain {
     }
     
     pub fn print(&self) {
-        for x in &self.chain {
-            println!("{:#?}", x);
+        for block in &self.chain {
+            block.print();
+            println!();
         }
+        println!("--------------------------------------");
         println!("Blockchain valid: {}", self.is_valid());
     }
 
-    pub fn make_block (&self, transaction: Transaction)-> Block {
+    pub fn make_block (&self, transactions: String)-> Block {
         let index = self.next_index();
         let timestamp = SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs();
-        let transactions = transaction.to_string();
         let previous_hash = self.chain.last().unwrap().hash();
         let (nonce, hash) = Block::mine(index, timestamp, &transactions, &previous_hash, self.difficulty);
 
